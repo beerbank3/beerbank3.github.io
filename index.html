@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LH청약 청년매입임대 주택 지도</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 320px;
+            background-color: #f5f5f5;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        .header {
+            background-color: #1e6de8;
+            color: white;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+        }
+        .filter-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+        .filter-section h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #333;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #1e6de8;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #1756b8;
+        }
+        .property-list {
+            margin-top: 20px;
+        }
+        .property-item {
+            background-color: white;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .property-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+        .property-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .property-address {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .property-details {
+            display: flex;
+            font-size: 13px;
+            color: #888;
+        }
+        .property-details span {
+            margin-right: 10px;
+        }
+        .property-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+        .status-available {
+            background-color: #e6f7e6;
+            color: #28a745;
+        }
+        .status-coming-soon {
+            background-color: #fff3cd;
+            color: #fd7e14;
+        }
+        .custom-overlay {
+            position: absolute;
+            background-color: white;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1;
+            width: 250px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #999;
+        }
+        .close-btn:hover {
+            color: #333;
+        }
+        .custom-overlay h4 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #1e6de8;
+        }
+        .custom-overlay p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        .custom-overlay .detail-btn {
+            margin-top: 10px;
+            text-align: center;
+            background-color: #1e6de8;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .marker {
+            width: 30px;
+            height: 30px;
+            background-color: #1e6de8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .filter-controls > div {
+            flex: 1;
+        }
+        .marker-label {
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+        }
+        .detail-modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            position: relative;
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            color: #333;
+        }
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .modal-title {
+            margin: 0;
+            font-size: 24px;
+            color: #1e6de8;
+        }
+        .modal-address {
+            margin-top: 5px;
+            font-size: 16px;
+            color: #666;
+        }
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        .detail-section h3 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        .detail-label {
+            font-weight: bold;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 3px;
+        }
+        .detail-value {
+            font-size: 16px;
+            color: #333;
+        }
+        .amenities-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .amenity-tag {
+            background-color: #e8f4fd;
+            color: #1e6de8;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 13px;
+        }
+        .requirement-item {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+        .requirement-item:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #1e6de8;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: 40%;
+                order: 2;
+            }
+            .map-container {
+                height: 60%;
+                order: 1;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+        }
+        .data-source {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+        .housing-count {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="header">LH청약 청년매입임대 주택</div>
+            
+            <div class="filter-section">
+                <h3>지역 선택</h3>
+                <div class="filter-controls">
+                    <div>
+                        <select id="citySelect">
+                            <option value="">시/도 선택</option>
+                            <option value="서울특별시">서울특별시</option>
+                            <option value="경기도">경기도</option>
+                            <option value="인천광역시">인천광역시</option>
+                            <option value="부산광역시">부산광역시</option>
+                            <option value="대구광역시">대구광역시</option>
+                            <option value="광주광역시">광주광역시</option>
+                            <option value="대전광역시">대전광역시</option>
+                            <option value="울산광역시">울산광역시</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="districtSelect">
+                            <option value="">구/군 선택</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <h3>조건 선택</h3>
+                <select id="roomTypeSelect">
+                    <option value="">주택 유형</option>
+                    <option value="원룸">원룸</option>
+                    <option value="1.5룸">1.5룸</option>
+                    <option value="투룸">투룸</option>
+                </select>
+                
+                <div class="filter-controls">
+                    <div>
+                        <input type="number" id="minRentInput" placeholder="최소 임대료(만원)">
+                    </div>
+                    <div>
+                        <input type="number" id="maxRentInput" placeholder="최대 임대료(만원)">
+                    </div>
+                </div>
+                
+                <button id="searchButton">검색하기</button>
+            </div>
+            
+            <div class="housing-count" id="housingCount"></div>
+            
+            <div class="property-list" id="propertyList">
+                <!-- 여기에 매물 목록이 표시됩니다 -->
+            </div>
+            
+            <div class="data-source">
+                데이터 출처: LH청약센터
+                <br>
+                최종 업데이트: <span id="lastUpdate">2024-04-11</span>
+            </div>
+        </div>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="loading" id="loadingIndicator">데이터를 불러오는 중...</div>
+        </div>
+    </div>
+    
+    <!-- 상세 정보 모달 -->
+    <div id="detailModal" class="detail-modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <p class="modal-address" id="modalAddress"></p>
+            </div>
+            
+            <div class="detail-section">
+                <h3>주택 정보</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">주택 유형</div>
+                        <div class="detail-value" id="modalRoomType"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">면적</div>
+                        <div class="detail-value" id="modalArea"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">임대료</div>
+                        <div class="detail-value" id="modalRent"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">보증금</div>
+                        <div class="detail-value" id="modalDeposit"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">건축년도</div>
+                        <div class="detail-value" id="modalBuildYear"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">공급 상태</div>
+                        <div class="detail-value" id="modalStatus"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h3>상세 설명</h3>
+                <p id="modalDetails"></p>
+            </div>
+            
+            <div class="detail-section">
+                <h3>편의시설</h3>
+                <div class="amenities-list" id="modalAmenities">
+                    <!-- 편의시설 태그가 여기에 추가됩니다 -->
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h3>입주 자격</h3>
+                <div id="modalRequirements">
+                    <!-- 입주 자격 요건이 여기에 추가됩니다 -->
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h3>신청 정보</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">신청 기간</div>
+                        <div class="detail-value" id="modalApplicationPeriod"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">문의처</div>
+                        <div class="detail-value" id="modalContactInfo"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <button id="applyButton" class="detail-btn" style="width: 100%; padding: 12px; font-size: 16px;">
+                    LH청약센터에서 신청하기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 서울시 구 목록
+        const seoulDistricts = [
+            '강남구', '강동구', '강북구', '강서구', '관악구', 
+            '광진구', '구로구', '금천구', '노원구', '도봉구', 
+            '동대문구', '동작구', '마포구', '서대문구', '서초구', 
+            '성동구', '성북구', '송파구', '양천구', '영등포구', 
+            '용산구', '은평구', '종로구', '중구', '중랑구'
+        ];
+        
+        // 경기도 시/군 목록
+        const gyeonggiDistricts = [
+            '고양시', '과천시', '광명시', '광주시', '구리시', 
+            '군포시', '김포시', '남양주시', '동두천시', '부천시', 
+            '성남시', '수원시', '시흥시', '안산시', '안성시', 
+            '안양시', '양주시', '여주시', '오산시', '용인시', 
+            '의왕시', '의정부시', '이천시', '파주시', '평택시', 
+            '포천시', '하남시', '화성시'
+        ];
+        
+        // 인천광역시 구/군 목록
+        const incheonDistricts = [
+            '계양구', '남동구', '동구', '미추홀구', '부평구', 
+            '서구', '연수구', '중구', '강화군', '옹진군'
+        ];
+
+        // 전역 변수
+        let map;
+        let markers = [];
+        let overlays = [];
+        let housingData = [];
+        let currentItem = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // 지역 선택 변경 시 이벤트
+            const citySelect = document.getElementById('citySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            citySelect.addEventListener('change', function() {
+                const selectedCity = this.value;
+                districtSelect.innerHTML = '<option value="">구/군 선택</option>';
+                
+                let districts = [];
+                if (selectedCity === '서울특별시') {
+                    districts = seoulDistricts;
+                } else if (selectedCity === '경기도') {
+                    districts = gyeonggiDistricts;
+                } else if (selectedCity === '인천광역시') {
+                    districts = incheonDistricts;
+                }
+                
+                districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            });
+            
+            // 검색 버튼 클릭 이벤트
+            const searchButton = document.getElementById('searchButton');
+            searchButton.addEventListener('click', function() {
+                filterProperties();
+            });
+            
+            // 모달 닫기 버튼 이벤트
+            const modalClose = document.querySelector('.modal-close');
+            modalClose.addEventListener('click', function() {
+                document.getElementById('detailModal').style.display = 'none';
+            });
+            
+            // 모달 외부 클릭 시 닫기
+            const detailModal = document.getElementById('detailModal');
+            window.addEventListener('click', function(event) {
+                if (event.target === detailModal) {
+                    detailModal.style.display = 'none';
+                }
+            });
+            
+            // 신청하기 버튼 클릭 이벤트
+            document.getElementById('applyButton').addEventListener('click', function() {
+                window.open('https://apply.lh.or.kr/', '_blank');
+            });
+            
+            // 카카오맵 스크립트 로드
+            const script = document.createElement('script');
+            script.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_MAP_API_KEY&libraries=services&autoload=false';
+            document.head.appendChild(script);
+            
+            script.onload = function() {
+                kakao.maps.load(function() {
+                    // 지도 생성
+                    const container = document.getElementById('map');
+                    const options = {
+                        center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 중심
+                        level: 9
+                    };
+                    
+                    map = new kakao.maps.Map(container, options);
+                    
+                    // 지도에 컨트롤 추가
+                    const zoomControl = new kakao.maps.ZoomControl();
+                    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+                    
+                    // 데이터 로드
+                    loadHousingData();
+                });
+            };
+        });
+        
+        // 주택 데이터 로드
+        function loadHousingData() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            
+            // JSON 파일에서 데이터 로드 (실제 운영 시에는 이 파일을 주기적으로 업데이트)
+            fetch('housing-data.json')
+                .then(response => response.json())
+                .then(data => {
+                    housingData = data;
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    
+                    // 초기 마커 생성
+                    createMarkers(housingData);
+                    
+                    // 최종 업데이트 날짜 표시
+                    if (data.length > 0 && data[0].lastUpdated) {
+                        document.getElementById('lastUpdate').textContent = data[0].lastUpdated;
+                    }
+                })
+                .catch(error => {
+                    console.error('데이터 로드 오류:', error);
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    alert('데이터를 불러오는 중 오류가 발생했습니다.');
+                    
+                    // 오류 발생 시 샘플 데이터 사용
+                    housingData = getSampleData();
+                    createMarkers(housingData);
+                });
+        }
+        
+        // 마커 생성 함수
+        function createMarkers(data) {
+            // 기존 마커 및 오버레이 제거
+            markers.forEach(marker => marker.setMap(null));
+            overlays.forEach(overlay => overlay.setMap(null));
+            markers = [];
+            overlays = [];
+            
+            // 주택 수 표시
+            document.getElementById('housingCount').textContent = `총 ${data.length}개의 청년매입임대 주택`;
+            
+            // 표시할 위치가 없을 경우
+            if (data.length === 0) {
+                renderPropertyList([]);
+                return;
+            }
+            
+            // 바운드 설정을 위한 객체
+            const bounds = new kakao.maps.LatLngBounds();
+            
+            data.forEach((item, index) => {
+                const position = new kakao.maps.LatLng(item.lat, item.lng);
+                
+                // 마커 생성
+                const markerElement = document.createElement('div');
+                markerElement.className = 'marker';
+                markerElement.textContent = index + 1;
+                
+                const marker = new kakao.maps.CustomOverlay({
+                    position: position,
+                    content: markerElement,
+                    map: map
+                });
+                
+                // 마커 클릭 이벤트
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    showItemDetails(item, position);
+                });
+                
+                markers.push(marker);
+                bounds.extend(position);
+            });
+            
+            // 지도 범위 조정
+            if (data.length > 0) {
+                map.setBounds(bounds);
+            }
+            
+            // 목록 업데이트
+            renderPropertyList(data);
+        }
+        
+        // 아이템 상세 정보 표시
+        function showItemDetails(item, position) {
+            // 기존 열린 오버레이 닫기
+            overlays.forEach(overlay => overlay.setMap(null));
+            
+            // 정보 오버레이 생성
+            const overlayContent = document.createElement('div');
+            overlayContent.className = 'custom-overlay';
+            overlayContent.innerHTML = `
+                <div class="close-btn">&times;</div>
+                <h4>${item.name}</h4>
+                <p><strong>주소:</strong> ${item.address}</p>
+                <p><strong>유형:</strong> ${item.roomType} (${item.area}㎡)</p>
+                <p><strong>임대료:</strong> 월 ${item.monthlyRent}만원 (보증금 ${item.deposit}만원)</p>
+                <p><strong>상태:</strong> ${item.status === 'available' ? '입주가능' : '입주예정'}</p>
+                <button class="detail-btn">자세히 보기</button>
+            `;
+            
+            const overlay = new kakao.maps.CustomOverlay({
+                position: position,
+                content: overlayContent,
+                map: map
+            });
+            
+            // 닫기 버튼 이벤트
+            const closeBtn = overlayContent.querySelector('.close-btn');
+            closeBtn.onclick = function() {
+                overlay.setMap(null);
+            };
+            
+            // 자세히 보기 버튼 이벤트
+            const detailBtn = overlayContent.querySelector('.detail-btn');
+            detailBtn.onclick = function() {
+                openDetailModal(item);
+            };
+            
+            overlays.push(overlay);
+        }
+        
+        // 상세 정보 모달 열기
+        function openDetailModal(item) {
+            currentItem = item;
+            
+            // 모달 정보 채우기
+            document.getElementById('modalTitle').textContent = item.name;
+            document.getElementById('modalAddress').textContent = item.address;
+            document.getElementById('modalRoomType').textContent = item.roomType;
+            document.getElementById('modalArea').textContent = `${item.area}㎡`;
+            document.getElementById('modalRent').textContent = `월 ${item.monthlyRent}만원`;
+            document.getElementById('modalDeposit').textContent = `${item.deposit}만원`;
+            document.getElementById('modalBuildYear').textContent = item.buildYear ? `${item.buildYear}년` : '정보 없음';
+            document.getElementById('modalStatus').textContent = item.status === 'available' ? '입주가능' : '입주예정';
+            document.getElementById('modalDetails').textContent = item.details || '상세 정보가 없습니다.';
+            
+            // 편의시설 표시
+            const amenitiesContainer = document.getElementById('modalAmenities');
+            amenitiesContainer.innerHTML = '';
+            
+            if (item.amenities && item.amenities.length > 0) {
+                item.amenities.forEach(amenity => {
+                    const amenityTag = document.createElement('div');
+                    amenityTag.className = 'amenity-tag';
+                    amenityTag.textContent = amenity;
+                    amenitiesContainer.appendChild(amenityTag);
+                });
+            } else {
+                amenitiesContainer.textContent = '등록된 편의시설 정보가 없습니다.';
+            }
+            
+            // 입주 자격 표시
+            const requirementsContainer = document.getElementById('modalRequirements');
+            requirementsContainer.innerHTML = '';
+            
+            if (item.requirements) {
+                const requirements = item.requirements.split('. ');
+                requirements.forEach(req => {
+                    if (req.trim()) {
+                        const reqItem = document.createElement('div');
+                        reqItem.className = 'requirement-item';
+                        reqItem.textContent = req.trim();
+                        requirementsContainer.appendChild(reqItem);
+                    }
+                });
+            } else {
+                const reqItem = document.createElement('div');
+                reqItem.className = 'requirement-item';
+                reqItem.textContent = '청년(만 19세~39세), 무주택자, 소득·자산 기준 충족 (자세한 사항은 공고문 참조)';
+                requirementsContainer.appendChild(reqItem);
+            }
+            
+            // 신청 정보 표시
+            document.getElementById('modalApplicationPeriod').textContent = item.applicationPeriod || '공고문 참조';
+            document.getElementById('modalContactInfo').textContent = item.contactInfo || 'LH콜센터: 1600-1004';
+            
+            // 모달 표시
+            document.getElementById('detailModal').style.display = 'block';
+        }
+        
+        // 속성 필터링 함수
+        function filterProperties() {
+            const selectedCity = document.getElementById('citySelect').value;
+            const selectedDistrict = document.getElementById('districtSelect').value;
+            const selectedRoomType = document.getElementById('roomTypeSelect').value;
+            const minRent = parseInt(document.getElementById('minRentInput').value) || 0;
+            const maxRent = parseInt(document.getElementById('maxRentInput').value) || Infinity;
+            
+            // 로딩 표시
+            document.getElementById('loadingIndicator').style.display = 'block';
+            
+            // 필터링 작업
+            setTimeout(() => {
+                const filteredData = housingData.filter(item => {
+                    const addressMatch = (!selectedCity || item.address.includes(selectedCity)) && 
+                                       (!selectedDistrict || item.address.includes(selectedDistrict));
+                    const roomTypeMatch = !selectedRoomType || item.roomType === selectedRoomType;
+                    const rentMatch = item.monthlyRent >= minRent && 
+                                    (maxRent === Infinity || item.monthlyRent <= maxRent);
+                    
+                    return addressMatch && roomTypeMatch && rentMatch;
+                });
+                
+                // 로딩 숨김
+                document.getElementById('loadingIndicator').style.display = 'none';
+                
+                // 결과 표시
+                createMarkers(filteredData);
+            }, 500);
+        }
+        
+        // 속성 목록 렌더링 함수
+        function renderPropertyList(data) {
+            const propertyListElement = document.getElementById('propertyList');
+            propertyListElement.innerHTML = '';
+            
+            if (data.length === 0) {
+                propertyListElement.innerHTML = '<p style="text-align: center; color: #888;">검색 결과가 없습니다.</p>';
+                return;
+            }
+            
+            data.forEach((item, index) => {
+                const propertyItem = document.createElement('div');
+                propertyItem.className = 'property-item';
+                propertyItem.innerHTML = `
+                    <div class="property-name">${item.name}</div>
+                    <div class="property-address">${item.address}</div>
+                    <div class="property-details">
+                        <span>${item.roomType} (${item.area}㎡)</span>
+                        <span>월 ${item.monthlyRent}만원</span>
+                    </div>
+                    <div class="property-status ${item.status === 'available' ? 'status-available' : 'status-coming-soon'}">
+                        ${item.status === 'available' ? '입주가능' : '입주예정'}
+                    </div>
+                `;
+                
+                // 목록 아이템 클릭 이벤트
+                propertyItem.addEventListener('click', function() {
+                    // 해당 마커 표시
+                    const position = new kakao.maps.LatLng(item.lat, item.lng);
+                    map.setCenter(position);
+                    map.setLevel(4);
+                    
+                    // 마커 클릭 이벤트 트리거 (오버레이 표시)
+                    showItemDetails(item, position);
+                    
+                    // 상세 모달 표시
+                    openDetailModal(item);
+                });
+                
+                propertyListElement.appendChild(propertyItem);
+            });
+        }
+        
+        // 샘플 데이터 (JSON 파일 로드 실패 시 사용)
+        function getSampleData() {
+            return [
+                {
+                    id: 1,
+                    name: "강남 청년주택 1호점",
+                    address: "서울특별시 강남구 역삼동 123-45",
+                    lat: 37.498095,
+                    lng: 127.027610,
+                    roomType: "원룸",
+                    area: 20.5,
+                    monthlyRent: 25,
+                    deposit: 1000,
+                    status: "available",
+                    availableUnits: 5,
+                    buildYear: 2018,
+                    details: "역삼역 도보 5분 거리, 편의시설 완비",
+                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션", "전자레인지"],
+                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
+                    applicationPeriod: "2024.03.15 ~ 2024.03.31",
+                    contactInfo: "LH콜센터: 1600-1004",
+                    lastUpdated: "2024-04-11"
+                },
+                {
+                    id: 2,
+                    name: "마포 청년주택 2호점",
+                    address: "서울특별시 마포구 서교동 456-78",
+                    lat: 37.556723,
+                    lng: 126.923991,
+                    roomType: "투룸",
+                    area: 35.8,
+                    monthlyRent: 38,
+                    deposit: 1500,
+                    status: "available",
+                    availableUnits: 3,
+                    buildYear: 2019,
+                    details: "홍대입구역 도보 10분 거리, 세탁실 공용",
+                    amenities: ["냉장고", "에어컨", "인덕션", "책상", "침대"],
+                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
+                    applicationPeriod: "2024.03.20 ~ 2024.04.05",
+                    contactInfo: "LH콜센터: 1600-1004",
+                    lastUpdated: "2024-04-11"
+                },
+                {
+                    id: 3,
+                    name: "송파 청년주택 3호점",
+                    address: "서울특별시 송파구 잠실동 789-10",
+                    lat: 37.513358,
+                    lng: 127.098600,
+                    roomType: "원룸",
+                    area: 18.2,
+                    monthlyRent: 22,
+                    deposit: 800,
+                    status: "coming-soon",
+                    availableUnits: 10,
+                    buildYear: 2020,
+                    details: "잠실역 도보 7분 거리, 공용 주방",
+                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션"],
+                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
+                    applicationPeriod: "2024.05.01 ~ 2024.05.15",
+                    contactInfo: "LH콜센터: 1600-1004",
+                    lastUpdated: "2024-04-11"
+                },
+                {
+                    id: 4,
+                    name: "성수 청년주택 4호점",
+                    address: "서울특별시 성동구 성수동 234-56",
+                    lat: 37.544323,
+                    lng: 127.055381,
+                    roomType: "1.5룸",
+                    area: 26.4,
+                    monthlyRent: 30,
+                    deposit: 1200,
+                    status: "available",
+                    availableUnits: 2,
+                    buildYear: 2021,
+                    details: "성수역 도보 3분 거리, 커뮤니티 공간 제공",
+                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션", "전자레인지", "책상"],
+                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
+                    applicationPeriod: "2024.04.01 ~ 2024.04.15",
+                    contactInfo: "LH콜센터: 1600-1004",
+                    lastUpdated: "2024-04-11"
+                },
+                {
+                    id: 5,
+                    name: "관악 청년주택 5호점",
+                    address: "서울특별시 관악구 신림동 345-67",
+                    lat: 37.484393,
+                    lng: 126.929756,
+                    roomType: "원룸",
+                    area: 22.8,
+                    monthlyRent: 20,
+                    deposit: 700,
+                    status: "available",
+                    availableUnits: 8,
+                    buildYear: 2017,
+                    details: "신림역 도보 8분 거리, 무인 택배함 설치",
+                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션"],
+                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
+                    applicationPeriod: "2024.03.10 ~ 2024.03.25",
+                    contactInfo: "LH콜센터: 1600-1004",
+                    lastUpdated: "2024-04-11"
+                },
+                {
+                    id: 6,
+                    name: "분당 청년주택 6호점",
+                    address: "경기도 성남시 분당구 서현동 456-78",
+                    lat: 37.385872,
+                    lng: 127.121878,
+                    roomType: "투룸",
+                    area: 38.5,
+                    monthlyRent: 35,
+                    deposit: 1800,
+                    status: "available",
+                    availableUnits: 4,
+                    buildYear: 2019,
+                    details: "서현역 도보 6분 거리, 전자레인지 제공",
+                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션", "전자레인지", "침대"],
+                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
+                    applicationPeriod: "2024.03.15 ~ 2024.03.30",
+                    contactInfo: "LH콜센터: 1600-1004",
+                    lastUpdated: "2024-04-11"
+                },
+                {
+                    id: 7,
+                    name: "일산 청년주택 7호점",
+                    address: "경기도 고양시 일산동구 장항동 567-89",
+                    lat: 37.661648,
+                    lng: 126.770121,
+                    roomType: "원룸",
+                    area: 24.3,
+                    monthlyRent: 28,
+                    deposit: 1100,
+                    status: "coming-soon",
+                    availableUnits: 6,
+                    buildYear: 2020,
+                    details: "정발산역 도보 10분 거리, 냉장고 제공",
+                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션"],
+                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
+                    applicationPeriod: "2024.05.10 ~ 2024.05.25",
+                    contactInfo: "LH콜센터: 1600-1004",
+                    lastUpdated: "2024-04-11"
+                },
+                {
+                    id: 8,
+                    name: "구로 청년주택 8호점",
+                    address: "서울특별시 구로구 구로동 678-90",
+                    lat: 37.483753,
+                    lng: 126.901371,
+                    roomType: "1.5룸",
+                    area: 25.6,
+                    monthlyRent: 27,
+                    deposit: 950,
+                    status: "available",
+                    availableUnits: 3,
+                    buildYear: 2018,
+                    details: "구로디지털단지역 도보 5분 거리, 보안 시스템 완비",
+                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션", "전자레인지"],
+                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
+                    applicationPeriod: "2024.04.05 ~ 2024.04.20",
+                    contactInfo: "LH콜센터: 1600-1004",
+                    lastUpdated: "2024-04-11"
+                }
+            ];
+        }
+    </script>
+</body>
+</html>
