@@ -293,6 +293,60 @@
             left: 0;
             color: #1e6de8;
         }
+        .rent-options {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .rent-options h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+        .rent-option-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .rent-option-item:last-child {
+            border-bottom: none;
+        }
+        .quarter-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            background-color: #e1f5fe;
+            color: #0277bd;
+            margin-left: 10px;
+        }
+        .image-gallery {
+            margin-top: 15px;
+        }
+        .gallery-button {
+            background-color: #f2f2f2;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        .gallery-button:hover {
+            background-color: #e0e0e0;
+        }
+        .supply-info {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #555;
+        }
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -386,8 +440,6 @@
             
             <div class="data-source">
                 데이터 출처: LH청약센터
-                <br>
-                최종 업데이트: <span id="lastUpdate">2025-04-12</span>
             </div>
         </div>
         
@@ -404,6 +456,7 @@
             <div class="modal-header">
                 <h2 class="modal-title" id="modalTitle"></h2>
                 <p class="modal-address" id="modalAddress"></p>
+                <div class="quarter-tag" id="modalQuarter"></div>
             </div>
             
             <div class="detail-section">
@@ -418,40 +471,53 @@
                         <div class="detail-value" id="modalArea"></div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">임대료</div>
-                        <div class="detail-value" id="modalRent"></div>
+                        <div class="detail-label">전용 면적</div>
+                        <div class="detail-value" id="modalPrivateArea"></div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">보증금</div>
-                        <div class="detail-value" id="modalDeposit"></div>
+                        <div class="detail-label">주거공용 면적</div>
+                        <div class="detail-value" id="modalPublicArea"></div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">건축년도</div>
-                        <div class="detail-value" id="modalBuildYear"></div>
+                        <div class="detail-label">층수</div>
+                        <div class="detail-value" id="modalFloor"></div>
                     </div>
+                    <div class="detail-item">
+                        <div class="detail-label">승강기</div>
+                        <div class="detail-value" id="modalElevator"></div>
+                    </div>
+        
                     <div class="detail-item">
                         <div class="detail-label">공급 상태</div>
                         <div class="detail-value" id="modalStatus"></div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="detail-section">
-                <h3>상세 설명</h3>
-                <p id="modalDetails"></p>
-            </div>
-            
-            <div class="detail-section">
-                <h3>편의시설</h3>
-                <div class="amenities-list" id="modalAmenities">
-                    <!-- 편의시설 태그가 여기에 추가됩니다 -->
+                
+                <div class="supply-info" id="modalSupplyInfo"></div>
+                
+                <div class="rent-options">
+                    <h4>임대료 옵션</h4>
+                    <div class="rent-option-item">
+                        <div>1순위 기본: 보증금 <span id="modalDeposit"></span></div>
+                        <div>월 임대료 <span id="modalRent"></span></div>
+                    </div>
+                    <div class="rent-option-item">
+                        <div>1순위 최대: 보증금 <span id="modalDepositOption1"></span></div>
+                        <div>월 임대료 <span id="modalRentOption1"></span></div>
+                    </div>
+                    <div class="rent-option-item">
+                        <div>2,3순위 기본: 보증금 <span id="modalDepositOption2"></span></div>
+                        <div>월 임대료 <span id="modalRentOption2"></span></div>
+                    </div>
+                    <div class="rent-option-item">
+                        <div>2,3순위 최대: 보증금 <span id="modalDepositOption3"></span></div>
+                        <div>월 임대료 <span id="modalRentOption3"></span></div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="detail-section">
-                <h3>입주 자격</h3>
-                <div id="modalRequirements">
-                    <!-- 입주 자격 요건이 여기에 추가됩니다 -->
+                
+                <div class="image-gallery">
+                    <button class="gallery-button" id="floorPlanButton">평면도 보기</button>
+                    <button class="gallery-button" id="houseImageButton">주택 사진 보기</button>
                 </div>
             </div>
             
@@ -461,10 +527,6 @@
                     <div class="detail-item">
                         <div class="detail-label">신청 기간</div>
                         <div class="detail-value" id="modalApplicationPeriod"></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">문의처</div>
-                        <div class="detail-value" id="modalContactInfo"></div>
                     </div>
                 </div>
             </div>
@@ -556,6 +618,23 @@
                 }
             });
             
+            // 평면도, 주택 사진 버튼 이벤트
+            document.getElementById('floorPlanButton').addEventListener('click', function() {
+                if (currentItem && currentItem.floorPlanUrl) {
+                    window.open(currentItem.floorPlanUrl, '_blank');
+                } else {
+                    alert('평면도 정보가 없습니다.');
+                }
+            });
+            
+            document.getElementById('houseImageButton').addEventListener('click', function() {
+                if (currentItem && currentItem.housePictureUrl) {
+                    window.open(currentItem.housePictureUrl, '_blank');
+                } else {
+                    alert('주택 사진 정보가 없습니다.');
+                }
+            });
+            
             // 신청하기 버튼 클릭 이벤트
             document.getElementById('applyButton').addEventListener('click', function() {
                 window.open('https://apply.lh.or.kr/', '_blank');
@@ -593,7 +672,7 @@
             
             // GitHub Pages에서 사용할 상대 경로 설정
             // 저장소 이름이 있는 경우 조정 필요 (예: /저장소명/housing-data.json)
-            const dataUrl = 'housing-data.json';
+            const dataUrl = 'https://beerbank3.github.io/housing-data.json';
             
             fetch(dataUrl)
                 .then(response => {
@@ -609,10 +688,6 @@
                     // 초기 마커 생성
                     createMarkers(housingData);
                     
-                    // 최종 업데이트 날짜 표시
-                    if (data.length > 0 && data[0].lastUpdated) {
-                        document.getElementById('lastUpdate').textContent = data[0].lastUpdated;
-                    }
                 })
                 .catch(error => {
                     console.error('데이터 로드 오류:', error);
@@ -692,6 +767,10 @@
             // 기존 열린 오버레이 닫기
             overlays.forEach(overlay => overlay.setMap(null));
             
+            // 임대료 원 단위를 만원 단위로 변환하여 표시
+            const monthlyRentInManWon = (item.monthlyRent / 10000).toFixed(1);
+            const depositInManWon = (item.deposit / 10000).toFixed(0);
+            
             // 정보 오버레이 생성
             const overlayContent = document.createElement('div');
             overlayContent.className = 'custom-overlay';
@@ -700,7 +779,7 @@
                 <h4>${item.name}</h4>
                 <p><strong>주소:</strong> ${item.address}</p>
                 <p><strong>유형:</strong> ${item.roomType} (${item.area}㎡)</p>
-                <p><strong>임대료:</strong> 월 ${item.monthlyRent}만원 (보증금 ${item.deposit}만원)</p>
+                <p><strong>임대료:</strong> 월 ${monthlyRentInManWon}만원 (보증금 ${depositInManWon}만원)</p>
                 <p><strong>상태:</strong> ${item.status === 'available' ? '입주가능' : '입주예정'}</p>
                 <button class="detail-btn">자세히 보기</button>
             `;
@@ -730,56 +809,42 @@
         function openDetailModal(item) {
             currentItem = item;
             
+            // 임대료 원 단위를 만원 단위로 변환
+            const monthlyRentInManWon = (item.monthlyRent / 10000).toFixed(1);
+            const depositInManWon = (item.deposit / 10000).toFixed(0);
+            
+            const depositOption1InManWon = item.depositOption1 ? (item.depositOption1 / 10000).toFixed(0) : "-";
+            const monthlyRentOption1InManWon = item.monthlyRentOption1 ? (item.monthlyRentOption1 / 10000).toFixed(1) : "-";
+            
+            const depositOption2InManWon = item.depositOption2 ? (item.depositOption2 / 10000).toFixed(0) : "-";
+            const monthlyRentOption2InManWon = item.monthlyRentOption2 ? (item.monthlyRentOption2 / 10000).toFixed(1) : "-";
+            
+            const depositOption3InManWon = item.depositOption3 ? (item.depositOption3 / 10000).toFixed(0) : "-";
+            const monthlyRentOption3InManWon = item.monthlyRentOption3 ? (item.monthlyRentOption3 / 10000).toFixed(1) : "-";
+            
             // 모달 정보 채우기
             document.getElementById('modalTitle').textContent = item.name;
             document.getElementById('modalAddress').textContent = item.address;
-            document.getElementById('modalRoomType').textContent = item.roomType;
+            document.getElementById('modalQuarter').textContent = item.quarter || '';
+            document.getElementById('modalRoomType').textContent = item.roomType || '원룸';
             document.getElementById('modalArea').textContent = `${item.area}㎡`;
-            document.getElementById('modalRent').textContent = `월 ${item.monthlyRent}만원`;
-            document.getElementById('modalDeposit').textContent = `${item.deposit}만원`;
-            document.getElementById('modalBuildYear').textContent = item.buildYear ? `${item.buildYear}년` : '정보 없음';
+            document.getElementById('modalPrivateArea').textContent = `${item.privateArea || '-'}㎡`;
+            document.getElementById('modalPublicArea').textContent = `${item.publicArea || '-'}㎡`;
+            document.getElementById('modalFloor').textContent = item.floor || '-';
+            document.getElementById('modalElevator').textContent = item.elevator === 'Y' ? '있음' : '없음';
+            document.getElementById('modalRent').textContent = `${monthlyRentInManWon}만원`;
+            document.getElementById('modalDeposit').textContent = `${depositInManWon}만원`;
+            document.getElementById('modalDepositOption1').textContent = `${depositOption1InManWon}만원`;
+            document.getElementById('modalRentOption1').textContent = `${monthlyRentOption1InManWon}만원`;
+            document.getElementById('modalDepositOption2').textContent = `${depositOption2InManWon}만원`;
+            document.getElementById('modalRentOption2').textContent = `${monthlyRentOption2InManWon}만원`;
+            document.getElementById('modalDepositOption3').textContent = `${depositOption3InManWon}만원`;
+            document.getElementById('modalRentOption3').textContent = `${monthlyRentOption3InManWon}만원`;
             document.getElementById('modalStatus').textContent = item.status === 'available' ? '입주가능' : '입주예정';
-            document.getElementById('modalDetails').textContent = item.details || '상세 정보가 없습니다.';
-            
-            // 편의시설 표시
-            const amenitiesContainer = document.getElementById('modalAmenities');
-            amenitiesContainer.innerHTML = '';
-            
-            if (item.amenities && item.amenities.length > 0) {
-                item.amenities.forEach(amenity => {
-                    const amenityTag = document.createElement('div');
-                    amenityTag.className = 'amenity-tag';
-                    amenityTag.textContent = amenity;
-                    amenitiesContainer.appendChild(amenityTag);
-                });
-            } else {
-                amenitiesContainer.textContent = '등록된 편의시설 정보가 없습니다.';
-            }
-            
-            // 입주 자격 표시
-            const requirementsContainer = document.getElementById('modalRequirements');
-            requirementsContainer.innerHTML = '';
-            
-            if (item.requirements) {
-                const requirements = item.requirements.split('. ');
-                requirements.forEach(req => {
-                    if (req.trim()) {
-                        const reqItem = document.createElement('div');
-                        reqItem.className = 'requirement-item';
-                        reqItem.textContent = req.trim();
-                        requirementsContainer.appendChild(reqItem);
-                    }
-                });
-            } else {
-                const reqItem = document.createElement('div');
-                reqItem.className = 'requirement-item';
-                reqItem.textContent = '청년(만 19세~39세), 무주택자, 소득·자산 기준 충족 (자세한 사항은 공고문 참조)';
-                requirementsContainer.appendChild(reqItem);
-            }
+            document.getElementById('modalSupplyInfo').textContent = `공급유형: ${item.supplyType || '-'} | 성별: ${item.genderType === '남여공용' ? '남녀공용' : item.genderType || '-'} | 주택유형: ${item.housingType || '-'}`;
             
             // 신청 정보 표시
             document.getElementById('modalApplicationPeriod').textContent = item.applicationPeriod || '공고문 참조';
-            document.getElementById('modalContactInfo').textContent = item.contactInfo || 'LH콜센터: 1600-1004';
             
             // 모달 표시
             document.getElementById('detailModal').style.display = 'block';
@@ -799,11 +864,14 @@
             // 필터링 작업
             setTimeout(() => {
                 const filteredData = housingData.filter(item => {
+                    // 임대료 원 단위를 만원 단위로 변환하여 비교
+                    const monthlyRentInManWon = Math.floor(item.monthlyRent / 10000);
+                    
                     const addressMatch = (!selectedCity || item.address.includes(selectedCity)) && 
                                        (!selectedDistrict || item.address.includes(selectedDistrict));
                     const roomTypeMatch = !selectedRoomType || item.roomType === selectedRoomType;
-                    const rentMatch = item.monthlyRent >= minRent && 
-                                    (maxRent === Infinity || item.monthlyRent <= maxRent);
+                    const rentMatch = monthlyRentInManWon >= minRent && 
+                                    (maxRent === Infinity || monthlyRentInManWon <= maxRent);
                     
                     return addressMatch && roomTypeMatch && rentMatch;
                 });
@@ -827,6 +895,9 @@
             }
             
             data.forEach((item, index) => {
+                // 임대료 원 단위를 만원 단위로 변환
+                const monthlyRentInManWon = (item.monthlyRent / 10000).toFixed(1);
+                
                 const propertyItem = document.createElement('div');
                 propertyItem.className = 'property-item';
                 propertyItem.innerHTML = `
@@ -834,10 +905,11 @@
                     <div class="property-address">${item.address}</div>
                     <div class="property-details">
                         <span>${item.roomType} (${item.area}㎡)</span>
-                        <span>월 ${item.monthlyRent}만원</span>
+                        <span>월 ${monthlyRentInManWon}만원</span>
                     </div>
                     <div class="property-status ${item.status === 'available' ? 'status-available' : 'status-coming-soon'}">
-                        ${item.status === 'available' ? '입주가능' : '입주예정'}
+                        ${item.status === 'available' ? '입주가능' : '입주예정'} 
+                        ${item.quarter ? `<span class="quarter-tag">${item.quarter}</span>` : ''}
                     </div>
                 `;
                 
@@ -863,164 +935,38 @@
         function getSampleData() {
             return [
                 {
-                    id: 1,
-                    name: "강남 청년주택 1호점",
-                    address: "서울특별시 강남구 역삼동 123-45",
-                    lat: 37.498095,
-                    lng: 127.027610,
-                    roomType: "원룸",
-                    area: 20.5,
-                    monthlyRent: 25,
-                    deposit: 1000,
-                    status: "available",
-                    availableUnits: 5,
-                    buildYear: 2018,
-                    details: "역삼역 도보 5분 거리, 편의시설 완비",
-                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션", "전자레인지"],
-                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
-                    applicationPeriod: "2024.03.15 ~ 2024.03.31",
-                    contactInfo: "LH콜센터: 1600-1004",
-                    lastUpdated: "2024-04-11"
-                },
-                {
-                    id: 2,
-                    name: "마포 청년주택 2호점",
-                    address: "서울특별시 마포구 서교동 456-78",
-                    lat: 37.556723,
-                    lng: 126.923991,
-                    roomType: "투룸",
-                    area: 35.8,
-                    monthlyRent: 38,
-                    deposit: 1500,
-                    status: "available",
-                    availableUnits: 3,
-                    buildYear: 2019,
-                    details: "홍대입구역 도보 10분 거리, 세탁실 공용",
-                    amenities: ["냉장고", "에어컨", "인덕션", "책상", "침대"],
-                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
-                    applicationPeriod: "2024.03.20 ~ 2024.04.05",
-                    contactInfo: "LH콜센터: 1600-1004",
-                    lastUpdated: "2024-04-11"
-                },
-                {
-                    id: 3,
-                    name: "송파 청년주택 3호점",
-                    address: "서울특별시 송파구 잠실동 789-10",
-                    lat: 37.513358,
-                    lng: 127.098600,
-                    roomType: "원룸",
-                    area: 18.2,
-                    monthlyRent: 22,
-                    deposit: 800,
-                    status: "coming-soon",
-                    availableUnits: 10,
-                    buildYear: 2020,
-                    details: "잠실역 도보 7분 거리, 공용 주방",
-                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션"],
-                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
-                    applicationPeriod: "2024.05.01 ~ 2024.05.15",
-                    contactInfo: "LH콜센터: 1600-1004",
-                    lastUpdated: "2024-04-11"
-                },
-                {
-                    id: 4,
-                    name: "성수 청년주택 4호점",
-                    address: "서울특별시 성동구 성수동 234-56",
-                    lat: 37.544323,
-                    lng: 127.055381,
-                    roomType: "1.5룸",
-                    area: 26.4,
-                    monthlyRent: 30,
-                    deposit: 1200,
-                    status: "available",
-                    availableUnits: 2,
-                    buildYear: 2021,
-                    details: "성수역 도보 3분 거리, 커뮤니티 공간 제공",
-                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션", "전자레인지", "책상"],
-                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
-                    applicationPeriod: "2024.04.01 ~ 2024.04.15",
-                    contactInfo: "LH콜센터: 1600-1004",
-                    lastUpdated: "2024-04-11"
-                },
-                {
-                    id: 5,
-                    name: "관악 청년주택 5호점",
-                    address: "서울특별시 관악구 신림동 345-67",
-                    lat: 37.484393,
-                    lng: 126.929756,
-                    roomType: "원룸",
-                    area: 22.8,
-                    monthlyRent: 20,
-                    deposit: 700,
-                    status: "available",
-                    availableUnits: 8,
-                    buildYear: 2017,
-                    details: "신림역 도보 8분 거리, 무인 택배함 설치",
-                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션"],
-                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
-                    applicationPeriod: "2024.03.10 ~ 2024.03.25",
-                    contactInfo: "LH콜센터: 1600-1004",
-                    lastUpdated: "2024-04-11"
-                },
-                {
-                    id: 6,
-                    name: "분당 청년주택 6호점",
-                    address: "경기도 성남시 분당구 서현동 456-78",
-                    lat: 37.385872,
-                    lng: 127.121878,
-                    roomType: "투룸",
-                    area: 38.5,
-                    monthlyRent: 35,
-                    deposit: 1800,
-                    status: "available",
-                    availableUnits: 4,
-                    buildYear: 2019,
-                    details: "서현역 도보 6분 거리, 전자레인지 제공",
-                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션", "전자레인지", "침대"],
-                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
-                    applicationPeriod: "2024.03.15 ~ 2024.03.30",
-                    contactInfo: "LH콜센터: 1600-1004",
-                    lastUpdated: "2024-04-11"
-                },
-                {
-                    id: 7,
-                    name: "일산 청년주택 7호점",
-                    address: "경기도 고양시 일산동구 장항동 567-89",
-                    lat: 37.661648,
-                    lng: 126.770121,
-                    roomType: "원룸",
-                    area: 24.3,
-                    monthlyRent: 28,
-                    deposit: 1100,
-                    status: "coming-soon",
-                    availableUnits: 6,
-                    buildYear: 2020,
-                    details: "정발산역 도보 10분 거리, 냉장고 제공",
-                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션"],
-                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
-                    applicationPeriod: "2024.05.10 ~ 2024.05.25",
-                    contactInfo: "LH콜센터: 1600-1004",
-                    lastUpdated: "2024-04-11"
-                },
-                {
-                    id: 8,
-                    name: "구로 청년주택 8호점",
-                    address: "서울특별시 구로구 구로동 678-90",
-                    lat: 37.483753,
-                    lng: 126.901371,
-                    roomType: "1.5룸",
-                    area: 25.6,
-                    monthlyRent: 27,
-                    deposit: 950,
-                    status: "available",
-                    availableUnits: 3,
-                    buildYear: 2018,
-                    details: "구로디지털단지역 도보 5분 거리, 보안 시스템 완비",
-                    amenities: ["냉장고", "세탁기", "에어컨", "인덕션", "전자레인지"],
-                    requirements: "청년(만 19세~39세). 무주택자. 소득·자산 기준 충족",
-                    applicationPeriod: "2024.04.05 ~ 2024.04.20",
-                    contactInfo: "LH콜센터: 1600-1004",
-                    lastUpdated: "2024-04-11"
+                    "id": 1,
+                    "name": "강남역삼동(비엔트) 604호",
+                    "address": "서울특별시 강남구 논현로64길 30(역삼동,비엔트)",
+                    "district": "강남구",
+                    "city": "서울특별시",
+                    "roomType": "원룸",
+                    "roomCount": 1,
+                    "area": 29.21,
+                    "privateArea": 22.97,
+                    "publicArea": 6.24,
+                    "floor": "6층",
+                    "elevator": "Y",
+                    "housingType": "도시형생활주택",
+                    "duplex": "N",
+                    "genderType": "남여공용",
+                    "supplyType": "단독(1인)",
+                    "deposit": 1000000,
+                    "monthlyRent": 553990,
+                    "depositOption1": 57900000,
+                    "monthlyRentOption1": 222070,
+                    "depositOption2": 2000000,
+                    "monthlyRentOption2": 680050,
+                    "depositOption3": 71900000,
+                    "monthlyRentOption3": 272300,
+                    "lat": 37.498095,
+                    "lng": 127.02761,
+                    "status": "available",
+                    "quarter": "2025년 1분기",
+                    "applicationPeriod": "2025-04-07~2025-04-09",
+                    "viewingSchedule": "열람불가(계약 전 주택 개방)",
+                    "floorPlanUrl": "",
+                    "housePictureUrl": ""
                 }
             ];
         }
