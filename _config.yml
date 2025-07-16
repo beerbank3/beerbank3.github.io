@@ -83,6 +83,7 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
   - jekyll-last-modified-at
+  - jekyll-include-cache
 
 # =============================================================================
 # Kramdown Settings
