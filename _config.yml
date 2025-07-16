@@ -1,16 +1,16 @@
 # =============================================================================
 # Site Settings
 # =============================================================================
-title: "DevNote"
-description: "Python 개발자의 기술 블로그 & 학습 노트"
+title: "BeerBank3's DevNote"
+description: "Python 개발자 beerbank3의 기술 블로그 & 학습 노트"
 url: "https://beerbank3.github.io"
 baseurl: ""
 
 # =============================================================================
 # Theme Settings
 # =============================================================================
-theme: just-the-docs/just-the-docs
-color_scheme: dark # 또는 nil for light mode
+theme: just-the-docs
+color_scheme: dark
 
 # =============================================================================
 # Search Settings
@@ -21,37 +21,26 @@ search:
   previews: 3
   preview_words_before: 5
   preview_words_after: 10
-  tokenizer_separator: /[\s/]+/
-  rel_url: true
-  button: false
 
 # =============================================================================
 # Navigation Settings
 # =============================================================================
-# Auxiliary links for the upper right navigation
 aux_links:
   "GitHub":
     - "https://github.com/beerbank3"
-  "Email":
-    - "mailto:yg050140528@gmail.com"
 
-# Makes Aux links open in a new tab
 aux_links_new_tab: true
-
-# Sort order for navigation links
 nav_sort: case_insensitive
 
 # =============================================================================
 # Footer Settings
 # =============================================================================
-footer_content: "Copyright &copy; 2025 beerbank3. Powered by <a href=\"https://github.com/just-the-docs/just-the-docs\">Just the Docs</a>."
-
-# Footer appears at the bottom of every page's main content
+footer_content: "Copyright &copy; 2025 beerbank3. Powered by Just the Docs."
 last_edit_timestamp: true
 last_edit_time_format: "%b %e %Y at %I:%M %p"
 
 # =============================================================================
-# Collections Settings (학습 노트 관리)
+# Collections Settings
 # =============================================================================
 collections:
   notes:
@@ -60,53 +49,31 @@ collections:
   snippets:
     permalink: "/snippets/:name/"
     output: true
-  projects:
-    permalink: "/projects/:name/"
-    output: true
 
 # =============================================================================
 # Default Front Matter
 # =============================================================================
 defaults:
-  # Posts defaults
   - scope:
       path: "_posts"
       type: "posts"
     values:
       layout: "default"
-      author: "Your Name"
       nav_exclude: false
-      search_exclude: false
       
-  # Notes collection defaults
   - scope:
       path: "_notes"
       type: "notes"
     values:
       layout: "default"
       parent: "Notes"
-      nav_exclude: false
-      search_exclude: false
       
-  # Snippets collection defaults
   - scope:
       path: "_snippets"
       type: "snippets"
     values:
       layout: "default"
       parent: "Code Snippets"
-      nav_exclude: false
-      search_exclude: false
-      
-  # Projects collection defaults
-  - scope:
-      path: "_projects"
-      type: "projects"
-    values:
-      layout: "default"
-      parent: "Projects"
-      nav_exclude: false
-      search_exclude: false
 
 # =============================================================================
 # Plugins
@@ -116,18 +83,6 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
   - jekyll-last-modified-at
-  - jekyll-archives
-
-# =============================================================================
-# Jekyll Archives Settings
-# =============================================================================
-jekyll-archives:
-  enabled: ['categories', 'tags', 'year']
-  layout: archive
-  permalinks:
-    category: '/category/:name/'
-    tag: '/tag/:name/'
-    year: '/year/:year/'
 
 # =============================================================================
 # Kramdown Settings
@@ -137,33 +92,6 @@ kramdown:
     default_lang: python
     block:
       line_numbers: true
-      start_line: 1
-
-# =============================================================================
-# Callouts Settings (알림 박스)
-# =============================================================================
-callouts_level: quiet
-callouts:
-  highlight:
-    color: yellow
-  important:
-    title: Important
-    color: blue
-  new:
-    title: New
-    color: green
-  note:
-    title: Note
-    color: purple
-  warning:
-    title: Warning
-    color: red
-
-# =============================================================================
-# Mermaid Settings (다이어그램)
-# =============================================================================
-mermaid:
-  version: "10.6.1"
 
 # =============================================================================
 # Build Settings
@@ -173,20 +101,12 @@ highlighter: rouge
 permalink: pretty
 timezone: Asia/Seoul
 
-# Exclude from processing
 exclude:
   - README.md
-  - CHANGELOG.md
   - Gemfile
   - Gemfile.lock
   - node_modules
-  - vendor/bundle/
-  - vendor/cache/
-  - vendor/gems/
-  - vendor/ruby/
-  - .gitignore
-  - .sass-cache/
+  - vendor/
 
-# Include in processing
 include:
   - _pages
